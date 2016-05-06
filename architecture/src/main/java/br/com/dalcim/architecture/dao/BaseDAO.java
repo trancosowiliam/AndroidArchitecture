@@ -1,22 +1,91 @@
 package br.com.dalcim.architecture.dao;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-public abstract class BaseDAO extends SQLiteOpenHelper{
+import java.util.ArrayList;
+import java.util.List;
 
+import br.com.dalcim.architecture.R;
+import br.com.dalcim.architecture.global.DB;
+import br.com.dalcim.architecture.model.Entity;
+
+public abstract class BaseDAO<E extends Entity> extends SQLiteOpenHelper{
+
+    /* CONSTRUCTORS */
     public BaseDAO(Context context) {
-        super(context, "TODO", null, 1);
+        super(  context,
+                context.getResources().getString(R.string.db_name),
+                null,
+                context.getResources().getInteger(R.integer.db_version));
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
+    /* CONTRACT */
+    protected abstract E cursorToEntity(Cursor c);
+    protected abstract ContentValues entityToContentValues(E entity);
+    protected abstract String getTable();
 
+    /* CRUD - CREATE */
+    public void insert(E entity){
+        entity.setId(getWritableDatabase().insert(getTable(), null, entityToContentValues(entity)));
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    /* CRUD - READ */
+    public List<E> getList(){
+        Cursor c = getReadableDatabase().rawQuery("SELECT * FROM " + getTable(), null);
+        return cursorToEntitys(c);
+    }
 
+    /* CRUD - READ */
+    public E get(int id){
+        SQLiteDatabase db = getReadableDatabase();
+        E retorno = null;
+        Cursor c;
+
+        try {
+            c = db.rawQuery("SELECT * FROM " + getTable() + " WHERE id=?;", new String[]{id + ""});
+            if (c.moveToNext()) {
+                retorno = cursorToEntity(c);
+            }
+        }  finally {
+            c = null;
+        }
+
+        return retorno;
+    }
+
+    /* CRUD - UPDATE */
+    public void update(E entity) {
+        ContentValues cv = entityToContentValues(entity);
+        cv.put("id", entity.getId());
+        getWritableDatabase().update(getTable(), cv, DB.COLUMN_ID + " = ?", new String[]{entity.getId() + ""});
+    }
+
+    /* CRUD - DELETE */
+    public void delete(E entity) {
+        getWritableDatabase().delete(getTable(), DB.COLUMN_ID + " = ?", new String[]{entity.getId() + ""});
+    }
+
+    /* ACTIONS AUXILIARYS */
+    public void save(E entity){
+        if(entity.getId() > 0){
+            update(entity);
+        }else{
+            insert(entity);
+        }
+    }
+
+    /* OUTHERS */
+    private List<E> cursorToEntitys(Cursor c){
+        ArrayList<E> list = new ArrayList<>();
+        while (c.moveToNext()){
+            list.add(cursorToEntity(c));
+        }
+        return list;
     }
 }
