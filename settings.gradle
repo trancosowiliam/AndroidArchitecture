@@ -1,1 +1,1 @@
-include ':architecture', ':butterknifeexemple', ':exemples'
+include ':architecture', ':butterknifeexemple', ':examples'
