@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Exemples</string>
+    <string name="db_name">exemples</string>
+</resources>
