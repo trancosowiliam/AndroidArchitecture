@@ -4,12 +4,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.dalcim.architecture.activity.BaseActivity;
+import br.com.dalcim.architecture.global.ListViewUtil;
 import br.com.dalcim.exemples.R;
 import br.com.dalcim.exemples.controller.FilmesController;
 import br.com.dalcim.exemples.model.Filme;
@@ -23,9 +24,7 @@ public class FilmesActivity extends BaseActivity{
     // COMPONENTES
     @Bind(R.id.fil_lst_filmes) ListView lstFilmes;
 
-    private List<Filme> filmes;
-    private ArrayAdapter<Filme> adapter;
-
+    private ArrayList<Filme> filmes;
     private FilmesController controller;
 
     @Override
@@ -46,8 +45,7 @@ public class FilmesActivity extends BaseActivity{
     }
 
     public void atualizaLista() {
-        adapter = new ArrayAdapter<Filme>(this, android.R.layout.simple_list_item_1, filmes);
-        lstFilmes.setAdapter(adapter);
+        ListViewUtil.geraListView(filmes, this);
     }
 
     @OnClick(R.id.fil_btn_novo)
@@ -83,7 +81,7 @@ public class FilmesActivity extends BaseActivity{
     }
 
     public void setFilmes(List<Filme> filmes) {
-        this.filmes = filmes;
+        this.filmes = (ArrayList<Filme>) filmes;
     }
 
     public void removeFilmeLista(Filme filme) {

@@ -2,11 +2,18 @@ package br.com.dalcim.exemples.model;
 
 import java.io.Serializable;
 
+import br.com.dalcim.architecture.adapter.BindListView;
+import br.com.dalcim.architecture.adapter.BindView;
 import br.com.dalcim.architecture.model.Entity;
+import br.com.dalcim.exemples.R;
 
+@BindListView(idListView = R.id.fil_lst_filmes, itemLayout = R.layout.item_filme)
 public class Filme implements Entity, Serializable{
+
     private long id;
+    @BindView(R.id.ifi_txt_nome)
     private String nome;
+    @BindView(R.id.ifi_txt_ano_lancamento)
     private int anoLancamento;
 
     public Filme() {
